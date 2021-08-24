@@ -1,0 +1,18 @@
+{
+  "name": "fullstack-vue-node-mongo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-back": "cd back && yarn dev",
+    "start-front": "cd front && yarn serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "vuex": "^3.6.2"
+  },
+  "proxy": "http://localhost:5000"
+}
