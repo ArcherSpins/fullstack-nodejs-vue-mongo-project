@@ -1,0 +1,51 @@
+.header
+    background-color: $main-light-color
+    display: flex
+    justify-content: space-between
+    align-items: center
+    box-shadow: 0px 2px 8px 1px #7fffb9
+    padding: 5px 50px
+
+    .dropdown-menu
+        background-color: $main-light-color
+
+        .dropdown-item
+            &:hover
+                color: $main-light-color !important
+
+    .profile-dropdown
+        *
+            color: white !important
+
+        img
+            width: 35px
+            margin-right: 10px
+
+    &-search
+        flex: 1
+        margin: 0 50px
+        max-width: 600px
+
+        .search-button
+            display: flex
+            justify-content: center
+            align-items: center
+            
+            img
+                width: 18px
+
+    &-nav
+        margin-left: 50px
+
+        &--link
+            text-transform: uppercase
+            color: white
+            padding: 0px 10px
+            text-decoration: none
+
+            &:hover
+                color: green
+
+    &-logo
+        img
+            width: 100px
