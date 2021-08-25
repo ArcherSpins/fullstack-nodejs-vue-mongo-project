@@ -1,6 +1,7 @@
 import { createWebHistory, createRouter } from 'vue-router';
 import Auth from '../pages/autorization.vue';
 import Main from '../pages/main.vue';
+import Profile from '../pages/profile.vue';
 
 // const checkUser = () => {
 //   const user = localStorage.getItem('user');
@@ -18,6 +19,11 @@ const routes = [
     name: 'Main',
     component: Main,
   },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
+  }
 ]
 
 const router = createRouter({

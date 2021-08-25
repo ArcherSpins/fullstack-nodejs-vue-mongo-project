@@ -27,7 +27,7 @@
                             <span>{{ user?.username || user?.email }}</span>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
-                            <li><a class="dropdown-item" href="#">Profile edit</a></li>
+                            <li><router-link class="dropdown-item" to="/profile">Profile edit</router-link></li>
                             <li><a class="dropdown-item" href="#">Settings</a></li>
                             <li><a @click.prevent="onLogout" class="dropdown-item" href="#">Exit</a></li>
                         </ul>

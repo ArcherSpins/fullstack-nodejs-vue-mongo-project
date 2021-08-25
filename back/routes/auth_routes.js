@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const { check, validationResult } = require('express-validator')
 const User = require('../models/User');
 const router = Router()
+const { getUser } = require('../helpers/getUser')
 
 // /api/auth/register have
 router.post(
@@ -80,10 +81,10 @@ router.post(
             const token = jwt.sign(
                 { userId: user.id },
                 config.get('jwtSecret'),
-                { expiresIn: '1h' }
+                { expiresIn: '5h' }
             )
-
-            res.json({ token, user })
+            
+            res.json({ token, user: getUser(user) })
 
         } catch (err) {
             console.log(err)
@@ -91,5 +92,6 @@ router.post(
         }
     }
 )
+
 
 module.exports = router
