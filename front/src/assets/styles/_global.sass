@@ -1,3 +1,9 @@
+@keyframes showModal
+    from
+        transform: translateY(-100%)
+    to
+        transform: translateY(0)
+    
 .btn-primary
     background-color: $main-color !important
     border-color: $main-color !important
@@ -18,6 +24,9 @@
 
 .modal.fade.bg
     background-color: $bg-color-opacity
+    .modal-dialog
+        animation-name: showModal
+        animation-duration: .5s
 
 .mr-1
     margin-right: 5px

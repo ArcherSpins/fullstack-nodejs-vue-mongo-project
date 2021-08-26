@@ -15,6 +15,12 @@ export const useRequest = async (url = '/', method = 'get', body = {}, headers =
             const data = await axios[method](API_URL + url, body, currentHeader);
             return data
         }
+
+        if (method === 'put') {
+            body.append('token', token)
+            const data = await axios[method](API_URL + url, body, currentHeader);
+            return data
+        }
         
         const data = await axios[method](API_URL + url, { headers: currentHeader });
         return data

@@ -1,7 +1,9 @@
 const { Router } = require('express')
 const config = require('config')
+const fs = require('fs');
+const path = require('path')
 const jwt = require('jsonwebtoken')
-const { check, validationResult } = require('express-validator')
+const { validationResult } = require('express-validator')
 const User = require('../models/User');
 const router = Router()
 const { getUser } = require('../helpers/getUser')
@@ -9,9 +11,6 @@ const { getUser } = require('../helpers/getUser')
 // /api/profile have
 router.put(
     '/update',
-    [
-        check('username', 'Некорректный username').isLength({ min: 1 })
-    ],
     async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -23,7 +22,7 @@ router.put(
             })
         }
 
-        const token = req.headers?.authorization?.replace(/(Bearer)\s/, '');
+        const token = req.headers?.authorization?.replace(/(Bearer)\s/, '') || req.body.token;
 
         if (!token) {
             return res.status(403).json({
@@ -31,30 +30,52 @@ router.put(
             })
         }
 
-        const { username } = req.body;
+        const request = async (filePath) => {
+            const { username } = req.body;
 
-        const resultVerify = jwt.verify(token, config.get('jwtSecret'));
+            const resultVerify = jwt.verify(token, config.get('jwtSecret'));
 
-        if (!resultVerify || !resultVerify.userId) {
-            return res.status(400).json({
-                errors: errors.array(),
-                message: 'Не валидный токен'
-            })
+            if (!resultVerify || !resultVerify.userId) {
+                return res.status(400).json({
+                    errors: errors.array(),
+                    message: 'Не валидный токен'
+                })
+            }
+            const user = await User.findOne({ _id: resultVerify.userId });
+
+            if (!user) {
+                res.status(400).json({ message: 'Не удалось найти пользователя' })
+                return;
+            }
+
+            user.username = username || user.username;
+            user.image = filePath || user.image
+
+            await user.save()
+
+            res.status(201).json({ message: 'Пользователь обновлен', user: getUser(user) })
         }
-        const user = await User.findOne({ _id: resultVerify.userId });
 
-        if (!user) {
-            res.status(400).json({ message: 'Не удалось найти пользователя' })
+        if (req.files?.file) {
+            const fileName = req.files.file.name.replace(/\s/g, '')
+            req.files.file.mv(path.join(__dirname, '/images/', fileName), (error) => {
+                if (error) {
+                  res.status(400).json(JSON.stringify({ status: 'error', message: error }))
+
+                  return
+                }
+
+                fs.readFile(path.join(__dirname, '/images/', fileName), (err, data) => {
+                    request('data:' + req.files.file.mimetype + ';base64, ' + Buffer.from(data).toString('base64'))
+                });
+              })
+            
             return;
         }
 
-        user.username = username;
-
-        await user.save()
-
-        res.status(201).json({ message: 'Пользователь обновлен', user: getUser(user) })
-
+        request()
     } catch (err) {
+        console.log(err)
         res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' })
     }
 })

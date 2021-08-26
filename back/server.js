@@ -1,6 +1,7 @@
 const express = require('express');
 const config = require('config')
 const mongoose = require('mongoose')
+const fileupload = require('express-fileupload')
 const cors = require('cors')
 const app = express();
 
@@ -8,6 +9,8 @@ const app = express();
 app.use(cors())
 // без него body будет undefined
 app.use(express.json({ extended: true }))
+
+app.use(fileupload())
 
 // use modules
 app.use('/api/auth', require('./routes/auth_routes'))

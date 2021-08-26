@@ -1,17 +1,20 @@
 <template>
-    <div class="modal fade show bg" style="display: block;" aria-hidden="true" tabindex="-1" role="dialog">
+    <div v-if="visible" class="modal modal-image-settings fade show bg" style="display: block;" aria-hidden="true" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Edit user avatar</h5>
+                    <button @click="handleClose" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Modal body text goes here.</p>
+                    <div class="modal-image-settings--selected-image" v-if="Boolean(imageSrc)" :style="{backgroundImage: `url('${getImgUrl()}')`}"></div>
+                    <div class="mt-3">
+                        <input type="file" accept=".jpg, .jpeg, .png" @change="handleChangeInputFile" />
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button :disabled="loading" @click="handleClose" type="button" class="btn" :class="{ 'btn-default': loading, 'btn-danger': !loading }" data-bs-dismiss="modal">Close</button>
+                    <button :disabled="loading" v-if="Boolean(file)" @click="handleConfirm" type="button" class="btn" :class="{ 'btn-default': loading, 'btn-primary': !loading }">Save changes</button>
                 </div>
             </div>
         </div>
@@ -19,7 +22,65 @@
 </template>
 
 <script>
-    export default {
+    import './style.sass'
+    
+    const readURL = file => {
+        return new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onload = e => res(e.target.result);
+            reader.onerror = e => rej(e);
+            reader.readAsDataURL(file);
+        });
+    };
 
+    export default {
+        props: {
+            visible: Boolean,
+            onClose: Function,
+            imageSrc: String,
+            onLoadFile: Function,
+            loading: Boolean
+        },
+        data() {
+            return {
+                url: null,
+                file: null
+            }
+        },
+        methods: {
+            handleClose() {
+                if (!this.$props.onClose) {
+                    return null;
+                }
+                this.$props.onClose(false)
+            },
+            getImgUrl() {
+                if (!this.$props.imageSrc && !this.url) {
+                    return null
+                }
+                return this.url || this.$props.imageSrc;
+            },
+            async handleChangeInputFile(event) {
+                const files = event.target.files
+                const url = await readURL(files[0]);
+                this.url = url
+                this.file = files[0];
+            },
+            handleCancel() {
+                this.url = null;
+                this.file = null;
+            },
+            handleConfirm() {
+                if (!this.file) {
+                    return;
+                }
+                const formData = new FormData()
+                formData.append('file', this.file)
+
+                if (this.$props.onLoadFile) {
+                    this.$props.onLoadFile(formData);
+                }
+            }
+        }
     }
 </script>

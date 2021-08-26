@@ -11,7 +11,6 @@
 <script>
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router'
-  import { useRequest } from './api/useRequest';
   import Header from './components/Header/Header.vue'
 
   export default {
@@ -35,18 +34,6 @@
       this.init()
     },
     methods: {
-      async getUser() {
-        this.loading = true;
-
-        const { data: { user } } = await useRequest('/profile');
-
-        if (JSON.stringify(user) !== localStorage.getItem('user')) {
-          localStorage.setItem('user', JSON.stringify(user))
-          if (!this.store.state.user) {
-            this.store.commit('setUser', user);
-          }
-        }
-      },
       checkRedirect() {
         const userJson = localStorage.getItem('user');
         if (!this.store.state.user && !userJson) {
@@ -63,7 +50,7 @@
       async init() {
         try {
           if (localStorage.getItem('token')) {
-            await this.getUser().catch(err => err.response.data.status === 'jwt' ? this.logout() : void 0);
+            await this.store.commit('getUser').catch(err => err.response.data.status === 'jwt' ? this.logout() : void 0);
           }
           
           this.checkRedirect()

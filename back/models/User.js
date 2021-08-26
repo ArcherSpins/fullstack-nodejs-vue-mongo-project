@@ -10,6 +10,7 @@ const schema = new Schema({
     lastname: { type: String },
     patronymic: { type: String },
     phone: { type: String },
+    image: { type: String },
 
     posts: [{ type: Types.ObjectId, ref: 'Post' }]
 })

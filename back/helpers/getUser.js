@@ -9,6 +9,7 @@ const getUser = (user) => {
     currentUser.lastname = user.lastname || null
     currentUser.patronymic = user.patronymic || null
     currentUser.phone = user.phone || null
+    currentUser.image = user.image || null
     return currentUser;
 }
 
