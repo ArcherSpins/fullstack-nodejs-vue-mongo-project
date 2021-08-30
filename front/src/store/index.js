@@ -11,11 +11,20 @@ export const store = createStore({
       state.user = user
       localStorage.setItem('user', JSON.stringify(user))
     },
-    async getUser(state) {
+    async getUser(state, onError) {
       if (localStorage.getItem('token')) {
         state.loading = true;
 
-        const { data: { user } } = await useRequest('/profile');
+        const response = await useRequest('/profile').catch(e => {
+          onError(e.response?.data?.status)
+        });
+
+        if (!response) {
+          state.loading = false
+          return;
+        }
+
+        const { data: { user } } = response;
 
         if (JSON.stringify(user) !== localStorage.getItem('user')) {
           localStorage.setItem('user', JSON.stringify(user))

@@ -31,7 +31,7 @@ router.put(
         }
 
         const request = async (filePath) => {
-            const { username } = req.body;
+            const { username, email, birthday, name, lastname, patronymic, phone } = req.body;
 
             const resultVerify = jwt.verify(token, config.get('jwtSecret'));
 
@@ -48,7 +48,13 @@ router.put(
                 return;
             }
 
-            user.username = username || user.username;
+            user.phone = phone ?? user.phone;
+            user.patronymic = patronymic ?? user.patronymic;
+            user.lastname = lastname ?? user.lastname;
+            user.name = name ?? user.name;
+            user.birthday = birthday ?? user.birthday;
+            user.email = email ?? user.email;
+            user.username = username ?? user.username;
             user.image = filePath || user.image
 
             await user.save()

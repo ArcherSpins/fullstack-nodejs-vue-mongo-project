@@ -74,11 +74,9 @@
                 if (!this.file) {
                     return;
                 }
-                const formData = new FormData()
-                formData.append('file', this.file)
 
                 if (this.$props.onLoadFile) {
-                    this.$props.onLoadFile(formData);
+                    this.$props.onLoadFile({ file: this.file });
                 }
             }
         }

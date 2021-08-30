@@ -50,13 +50,17 @@
       async init() {
         try {
           if (localStorage.getItem('token')) {
-            await this.store.commit('getUser').catch(err => err.response.data.status === 'jwt' ? this.logout() : void 0);
+            this.store.commit('getUser', (status) => status === 'jwt' ? this.logout() : void 0);
           }
           
           this.checkRedirect()
         } catch(e) {
+          console.log(e.response);
           this.loading = false;
           this.checkRedirect()
+          if (e.response?.data?.status === 'jwt') {
+            this.logout()
+          }
         }
       },
       logout() {
