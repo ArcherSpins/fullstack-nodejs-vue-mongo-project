@@ -99,7 +99,7 @@
             },
 
             async handleSave() {
-                if (this.$props.onSave && !this.$props.required) {
+                if (this.$props.onSave && this.$props.required ? Boolean(this.currentValue) : true) {
                     try {
                         this.loading = true;
                         await this.$props.onSave({ name: this.$props.name, value: this.currentValue });

@@ -23,7 +23,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown profile-dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img alt="user" src="../../assets/user-icon.png" />
+                            <div class="header-user--avatar" :style="{ backgroundImage: `url('${getImgUrl()}')`}" />
                             <span>{{ user?.username || user?.email }}</span>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
@@ -39,9 +39,15 @@
 </template>
 
 <script>
+    import { useStore } from 'vuex'
     import './Header.sass'
 
     export default {
+        setup() {
+            const store = useStore();
+
+            return { store };
+        },
         props: {
             user: Object,
             logout: Function,
@@ -78,6 +84,9 @@
                 if (this.$props.logout) {
                     this.$props.logout();
                 }
+            },
+            getImgUrl() {
+                return this.store._state.data.user.image;
             }
         }
     }
