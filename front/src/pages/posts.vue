@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex justify-content-between container pt-4 posts">
+    <div class="d-flex justify-content-between container pt-4 posts align-items-start">
         <div class="posts-left--column pt-0 pb-0">
             <div class="mb-3">
                 <div class="search-bar">
@@ -36,23 +36,78 @@
                     </ul>
                 </div>
             </div>
-            <div>
-                <div class="mb-3">
-                    <post-card />
-                </div>
-                <div class="mb-3">
-                    <post-card />
-                </div>
-                <div>
+            <div class="posts-list">
+                <div v-for="item in Array.from({ length: 40 }).map((_, i) => i)" :key="item" class="mb-3">
                     <post-card />
                 </div>
             </div>
         </div>
-        <div class="card posts-right--column">2</div>
+        <div class="card posts-right--column">
+            <button class="btn btn-primary btn-sm" type="button">Create post</button>
+            <div class="mt-3">
+                <span class="badge bg-primary mx-1">All posts: 30</span>
+                <span class="badge bg-success mx-1">My posts: 14</span>
+                <span class="badge bg-warning text-dark mx-1">Important posts: 8</span>
+                <span class="badge bg-danger mx-1">Canceled posts: 3</span>
+                <span class="badge bg-info mx-1">Any posts: 5</span>
+                <span class="badge bg-dark mx-1">Admin posts: 2</span>
+            </div>
+            <b class="mt-4 mb-1 text-success">Filters: </b>
+            <div class="d-flex justify-content-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_all" checked>
+                    <label class="form-check-label" for="post_by_type_all">
+                        All posts
+                    </label>
+                </div>
+                <div class="form-check ml-2">
+                    <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_self">
+                    <label class="form-check-label" for="post_by_type_self">
+                        My posts
+                    </label>
+                </div>
+                <div class="form-check ml-2">
+                    <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_any">
+                    <label class="form-check-label" for="post_by_type_any">
+                        Any posts
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-2 mt-3">
+                <p class="mb-0 text-success">Start date: </p>
+                <Datepicker
+                    v-model="startDate"
+                    :clearable="true"
+                />
+            </div>
+
+            <div>
+                <p class="mb-0 text-success">End date: </p>
+                <Datepicker
+                    v-model="endDate"
+                    :clearable="true"
+                />
+            </div>
+
+            <div class="form-check form-check-inline mt-3">
+                <input class="form-check-input" type="checkbox" id="post_type_important" value="option1">
+                <label class="form-check-label" for="post_type_important">Important posts</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="post_type_canceled" value="option2">
+                <label class="form-check-label" for="post_type_canceled">Canceled posts</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="post_type_admin" value="option3" disabled>
+                <label class="form-check-label" for="post_type_admin">Admin posts</label>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+    import Datepicker from 'vue3-datepicker';
     import _ from 'lodash';
     import PostCard from '../components/Post/Post';
     import './style.sass';
@@ -61,11 +116,14 @@
         data() {
             return {
                 searchValue: '',
-                loadingSearchResult: false
+                loadingSearchResult: false,
+                startDate: new Date(),
+                endDate: new Date(),
             }
         },
         components: {
-            PostCard
+            PostCard,
+            Datepicker
         },
         computed: {
             checkShowSearchMenu() {

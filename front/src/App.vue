@@ -3,7 +3,11 @@
       <div v-if="Boolean(store.state.user)">
         <Header :init="init" :user="store.state.user" :logout="logout" />
       </div>
-      <router-view v-if="!loading" />
+      <div class="pt-5">
+        <div class="pt-3">
+          <router-view v-if="!loading" />
+        </div>
+      </div>
       <div v-if="loading">Loading...</div>
   </div>
 </template>

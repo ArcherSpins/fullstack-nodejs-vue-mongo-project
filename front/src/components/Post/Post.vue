@@ -13,9 +13,13 @@
                 </div>
             </div>
             <div class="d-flex align-items-start">
-                <button type="button" class="btn btn-link outline-none border-none px-0 py-0">
+                <button type="button" class="btn btn-link dropdown-toggle outline-none border-none px-0 py-0" id="edit-post-1" data-bs-toggle="dropdown" aria-expanded="false">
                     <font-awesome-icon icon="ellipsis-h" color="gray" />
                 </button>
+                <ul class="dropdown-menu" aria-labelledby="edit-post-1">
+                    <li><a class="dropdown-item" href="#">Edit</a></li>
+                    <li><a class="dropdown-item" href="#">Delete</a></li>
+                </ul>
             </div>
         </div>
     </div>
