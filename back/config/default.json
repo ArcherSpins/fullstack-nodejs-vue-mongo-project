@@ -1,5 +1,6 @@
 {
     "port": 5000,
     "mongoUri": "mongodb+srv://ahmed:A8h9m8e9d@base.egzoi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-    "jwtSecret": "ahmed dev block"
+    "jwtSecret": "ahmed dev block",
+    "baseUrl": "http://localhost:5000"
 }

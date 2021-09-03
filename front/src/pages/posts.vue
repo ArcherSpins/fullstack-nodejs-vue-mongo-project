@@ -45,12 +45,12 @@
         <div class="card posts-right--column">
             <button class="btn btn-primary btn-sm" type="button">Create post</button>
             <div class="mt-3">
-                <span class="badge bg-primary mx-1">All posts: 30</span>
-                <span class="badge bg-success mx-1">My posts: 14</span>
-                <span class="badge bg-warning text-dark mx-1">Important posts: 8</span>
-                <span class="badge bg-danger mx-1">Canceled posts: 3</span>
-                <span class="badge bg-info mx-1">Any posts: 5</span>
-                <span class="badge bg-dark mx-1">Admin posts: 2</span>
+                <span class="badge bg-primary mx-1">All: 30</span>
+                <span class="badge bg-success mx-1">My: 14</span>
+                <span class="badge bg-dark mx-1">Admin: 2</span>
+                <span class="badge bg-warning text-dark mx-1">Important: 8</span>
+                <span class="badge bg-info mx-1">Active: 5</span>
+                <span class="badge bg-danger mx-1">Canceled: 3</span>
             </div>
             <b class="mt-4 mb-1 text-success">Filters: </b>
             <div class="d-flex justify-content-center">
@@ -69,7 +69,7 @@
                 <div class="form-check ml-2">
                     <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_any">
                     <label class="form-check-label" for="post_by_type_any">
-                        Any posts
+                        Admin posts
                     </label>
                 </div>
             </div>
@@ -99,8 +99,8 @@
                 <label class="form-check-label" for="post_type_canceled">Canceled posts</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="post_type_admin" value="option3" disabled>
-                <label class="form-check-label" for="post_type_admin">Admin posts</label>
+                <input class="form-check-input" type="checkbox" id="post_type_active" value="option3">
+                <label class="form-check-label" for="post_type_active">Active posts</label>
             </div>
         </div>
     </div>

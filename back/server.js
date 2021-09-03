@@ -17,6 +17,8 @@ app.use('/api/auth', require('./routes/auth_routes'))
 
 app.use('/api/profile', require('./routes/profile_routes'))
 
+app.use('/api/posts', require('./routes/posts_routes'))
+
 // start web server
 const PORT = config.get('port') || 5000;
 async function start() {

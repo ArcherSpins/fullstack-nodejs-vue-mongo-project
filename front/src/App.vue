@@ -3,8 +3,8 @@
       <div v-if="Boolean(store.state.user)">
         <Header :init="init" :user="store.state.user" :logout="logout" />
       </div>
-      <div class="pt-5">
-        <div class="pt-3">
+      <div :class="{'pt-5': checkAuth}">
+        <div :class="{'pt-3': checkAuth}">
           <router-view v-if="!loading" />
         </div>
       </div>
@@ -36,6 +36,13 @@
     },
     mounted() {
       this.init()
+    },
+    computed: {
+      checkAuth() {
+        const userJson = localStorage.getItem('user');
+
+        return Boolean(this.store.state.user || userJson)
+      }
     },
     methods: {
       checkRedirect() {
