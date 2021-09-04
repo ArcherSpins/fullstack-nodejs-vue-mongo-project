@@ -28,6 +28,7 @@
 <script>
     import { useStore } from 'vuex'
     import moment from 'moment'
+    import userImage from '../../assets/user.jpg'
     import './Post.sass'
 
     export default {
@@ -36,12 +37,19 @@
 
             return { store }
         },
+        props: {
+            post: Object,
+            user: Object,
+        },
         methods: {
             getImgUrl() {
-                return this.store._state.data.user.image;
+                return this.$props.user?.image || userImage;
             },
             getUserName() {
-                const { username, name, lastname, emal } = this.store._state.data.user;
+                if (!this.$props.user) {
+                    return 'User ' + Date.now();
+                }
+                const { username, name, lastname, emal } = this.$props.user;
                 return (name && lastname ? `${name} ${lastname}` : username || emal);
             },
             getFormatDate() {

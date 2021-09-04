@@ -53,24 +53,13 @@
                     {{ registerButtonLabel }}
                 </button>
             </form>
-            <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-                <div
-                    class="toast bg-success"
-                    :class="{ hide: !successRequestMessage, show: Boolean(successRequestMessage) }"
-                    role="alert"
-                    aria-live="assertive"
-                    aria-atomic="true"
-                >
-                    <div class="toast-header">
-                        <strong class="me-auto">Good request result!!!</strong>
-                        <small>{{ dateCreateRequest }}</small>
-                        <button @click="clearSuccessRequestMessage" type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Закрыть"></button>
-                    </div>
-                    <div class="toast-body text-white">
-                        {{ successRequestMessage }}
-                    </div>
-                </div>
-            </div>
+            <alert-message
+                :content="successRequestMessage"
+                :dateMessage="dateCreateRequest"
+                :visible="Boolean(successRequestMessage)"
+                :type="typeSuccessMessage"
+                :onClick="clearSuccessRequestMessage"
+            />
             <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
                 <div
                     class="toast bg-danger"
@@ -89,12 +78,21 @@
                     </div>
                 </div>
             </div>
+            <alert-message
+                :content="errorRequestMessage"
+                :dateMessage="dateCreateErrorRequest"
+                :visible="Boolean(errorRequestMessage)"
+                :type="typeErrorMessage"
+                :onClick="clearErrorRequestMessage"
+                :title="titleErrorMessage"
+            />
         </div>
     </div>
 </template>
 
 <script>
     import moment from 'moment';
+    import AlertMessage from '../AlertMessage/AlertMessage'
     import { checkEmail, checkPassword } from '../../heplers'
     import './AuthForm.sass';
 
@@ -111,6 +109,9 @@
                 errorRequestMessage: null,
                 successRequestMessage: null,
                 isRegister: false,
+                typeSuccessMessage: 'bg-success',
+                typeErrorMessage: 'bg-danger',
+                titleErrorMessage: 'Oops, something error!!!',
                 errors: {
                     email: {
                         message: null
@@ -123,6 +124,9 @@
                     }
                 },
             }
+        },
+        components: {
+            AlertMessage
         },
         computed: {
             loginButtonLabel() {

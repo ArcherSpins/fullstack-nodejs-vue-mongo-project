@@ -36,9 +36,17 @@
                     </ul>
                 </div>
             </div>
-            <div class="posts-list">
-                <div v-for="item in Array.from({ length: 40 }).map((_, i) => i)" :key="item" class="mb-3">
-                    <post-card />
+            <div v-if="loadingPosts" class="d-flex justify-content-center">
+                <div class="spinner-border text-success mx-auto" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+            <div v-if="!loadingPosts && posts.length" class="posts-list">
+                <div v-for="item in posts" :key="item.id" class="mb-3">
+                    <post-card :user="item.user" />
+                </div>
+                <div v-if="errorMessage" class="text-danger">
+                    {{ errorMessage }}
                 </div>
             </div>
         </div>
@@ -110,6 +118,7 @@
     import Datepicker from 'vue3-datepicker';
     import _ from 'lodash';
     import PostCard from '../components/Post/Post';
+    import { useRequest } from '../api/useRequest.js';
     import './style.sass';
 
     export default {
@@ -119,6 +128,9 @@
                 loadingSearchResult: false,
                 startDate: new Date(),
                 endDate: new Date(),
+                posts: [],
+                loadingPosts: false,
+                errorMessage: null
             }
         },
         components: {
@@ -130,6 +142,9 @@
                 return Boolean(this.searchValue);
             }
         },
+        mounted() {
+            this.getPosts();
+        },
         methods: {
             handleRequestSearch: _.debounce(function () {
                 this.loadingSearchResult = true;
@@ -138,6 +153,18 @@
             handleChangeSearch(e) {
                 this.searchValue = e.target.value;
                 this.handleRequestSearch(e.target.value);
+            },
+            async getPosts() {
+                try {
+                    this.loadingPosts = true;
+                    const { data } = await useRequest('/posts');
+                    this.posts = data;
+                    this.loadingPosts = false;
+                    this.errorMessage = null;
+                } catch (err) {
+                    this.loadingPosts = false;
+                    this.errorMessage = err.message || JSON.stringify(err);
+                }
             }
         }
     }

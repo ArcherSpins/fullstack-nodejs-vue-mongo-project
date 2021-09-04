@@ -1,13 +1,15 @@
 const { Router } = require('express')
 const Post = require('../models/Post')
+const User = require('../models/User')
 const auth = require('../middleware/auth_middleware')
+const { getUser } = require('../helpers/getUser')
 const router = Router()
 
-router.post('/create', async (req, res) => {
+router.post('/create', auth, async (req, res) => {
     try {
-        const { title, content, typeUser, typePost } = req.body
+        const { title, content, typeUser, typePost, userId } = req.body
 
-        const post = new Post({ title, content, typeUser: typeUser || 'user', typePost: typePost || 'active' })
+        const post = new Post({ title, content, typeUser: typeUser || 'user', typePost: typePost || 'active', userId })
 
         await post.save()
 
@@ -18,7 +20,7 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const { typeUser, typePost, userId, search, startDate, endDate } = req.query;
 
@@ -59,14 +61,22 @@ router.get('/', async (req, res) => {
         // Post.geoSearch
 
         const posts = await Post.find(filter) // ???
-        res.json(posts);
+        const users = await User.find({})
+
+        const findUser = (post) => {
+            return users.find(user => {
+                return String(user.id) === String(post.userId)
+            })
+        }
+
+        res.json(Array.from(posts).map(post => ({ post, user: getUser(findUser(post), posts) })));
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' })
     }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
         const posts = await Post.findById(req.params.id) // ???
         res.json(posts);

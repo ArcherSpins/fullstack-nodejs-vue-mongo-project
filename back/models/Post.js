@@ -7,7 +7,8 @@ const schema = new Schema({
     typeUser: { type: String, required: false, default: 'user' }, // user, admin
     typePost: { type: String, required: false, default: 'active' }, // active, important, canceled
     date: { type: Date, default: Date.now },
-    comments: [{ type: Types.ObjectId, ref: 'Comment' }]
+    comments: [{ type: Types.ObjectId, ref: 'Comment' }],
+    userId: { type: Types.ObjectId, ref: 'User' }
 })
 
 schema.index({'title': 'text'});

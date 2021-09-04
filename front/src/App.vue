@@ -66,7 +66,6 @@
           
           this.checkRedirect()
         } catch(e) {
-          console.log(e.response);
           this.loading = false;
           this.checkRedirect()
           if (e.response?.data?.status === 'jwt') {
@@ -75,10 +74,12 @@
         }
       },
       logout() {
-        this.store.commit('setUser', null);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
         this.router.push('/')
+        setTimeout(() => {
+          this.store.commit('setUser', null);
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+        }, 0)
       }
     }
   }

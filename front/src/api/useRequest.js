@@ -3,6 +3,10 @@ import axios from 'axios';
 const API_URL = 'http://localhost:5000/api';
 
 export const useRequest = async (url = '/', method = 'get', body = {}, headers = { 'Content-Type': 'application/json' }) => {
+    if (!url.includes('auth') && !localStorage.getItem('user')) {
+        return {};
+    }
+
     const token = localStorage.getItem('token');
     const currentHeader = { ...headers }
 
