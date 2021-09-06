@@ -22,6 +22,9 @@
                 </ul>
             </div>
         </div>
+        <div>
+            {{ $props.post?.title }}
+        </div>
     </div>
 </template>
 
@@ -49,6 +52,7 @@
                 if (!this.$props.user) {
                     return 'User ' + Date.now();
                 }
+                console.log(this.$props.post)
                 const { username, name, lastname, emal } = this.$props.user;
                 return (name && lastname ? `${name} ${lastname}` : username || emal);
             },

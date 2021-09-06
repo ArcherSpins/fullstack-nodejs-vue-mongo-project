@@ -3,7 +3,7 @@
         <div class="posts-left--column pt-0 pb-0">
             <div class="mb-3">
                 <div class="search-bar">
-                    <input @input="handleChangeSearch" :value="searchValue" placeholder="Enter text for search..." class="form-control">
+                    <input @focus="handleChangeFocus" @blur="handleBlur" @input="handleChangeSearch" :value="filters.search" placeholder="Enter text for search..." class="form-control">
                     <span class="search-bar--icon">
                         <font-awesome-icon icon="search" color="black" />
                     </span>
@@ -41,9 +41,14 @@
                     <span class="visually-hidden">Загрузка...</span>
                 </div>
             </div>
+            <div v-if="!loadingPosts && !posts.length" class="d-flex justify-content-center">
+                <div class="text-dark" role="status">
+                    <span>Not found posts...</span>
+                </div>
+            </div>
             <div v-if="!loadingPosts && posts.length" class="posts-list">
                 <div v-for="item in posts" :key="item.id" class="mb-3">
-                    <post-card :user="item.user" />
+                    <post-card :user="item.user" :post="item.post" />
                 </div>
                 <div v-if="errorMessage" class="text-danger">
                     {{ errorMessage }}
@@ -99,15 +104,15 @@
             </div>
 
             <div class="form-check form-check-inline mt-3">
-                <input class="form-check-input" type="checkbox" id="post_type_important" value="option1">
+                <input :checked="filters.typePost.important" @input.stop="handleChangeTypePost" class="form-check-input" type="checkbox" id="post_type_important" value="important">
                 <label class="form-check-label" for="post_type_important">Important posts</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="post_type_canceled" value="option2">
+                <input :checked="filters.typePost.canceled" @input.stop="handleChangeTypePost" class="form-check-input" type="checkbox" id="post_type_canceled" value="canceled">
                 <label class="form-check-label" for="post_type_canceled">Canceled posts</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="post_type_active" value="option3">
+                <input :checked="filters.typePost.active" @input.stop="handleChangeTypePost" class="form-check-input" type="checkbox" id="post_type_active" value="active">
                 <label class="form-check-label" for="post_type_active">Active posts</label>
             </div>
         </div>
@@ -124,13 +129,18 @@
     export default {
         data() {
             return {
-                searchValue: '',
                 loadingSearchResult: false,
                 startDate: new Date(),
                 endDate: new Date(),
                 posts: [],
                 loadingPosts: false,
-                errorMessage: null
+                isFocusedSearchBar: false,
+                errorMessage: null,
+                filters: {
+                    search: '',
+                    typePost: {},
+                    typeUser: null
+                }
             }
         },
         components: {
@@ -139,25 +149,83 @@
         },
         computed: {
             checkShowSearchMenu() {
-                return Boolean(this.searchValue);
+                return false;
+            }
+        },
+        watch: {
+            filters() {
+                this.getPostWithFilters()
             }
         },
         mounted() {
-            this.getPosts();
+            const filters = localStorage.getItem('filters')
+
+            if (filters) {
+                this.filters = JSON.parse(filters)
+            } else {
+                this.getPosts()
+            }
         },
         methods: {
+            getPostWithFilters() {
+                const { typePost, search } = this.filters;
+                let queryParams = '?'
+                let hasQuery = false;
+
+                localStorage.setItem('filters', JSON.stringify(this.filters))
+
+                const typePosts = Object.values(typePost).filter(Boolean);
+
+                if (typePosts.length) {
+                    hasQuery = true;
+                    queryParams += `typePost=`
+                    Object.keys(typePost).forEach((typePost, idx) => queryParams += ((idx > 0 ? ',' : '') + typePost));
+                }
+
+                if (search) {
+                    if (hasQuery) {
+                        queryParams += `&search=${search}`
+                    } else {
+                        hasQuery = true;
+                        queryParams += `search=${search}`
+                    }
+                }
+
+                if (hasQuery) {
+                    this.getPosts(queryParams);
+                }
+            },
+            handleChangeTypePost({ target }) {
+                this.filters = {
+                    ...this.filters,
+                    typePost: {
+                        ...this.filters.typePost,
+                        [target.value]: target.checked
+                    }
+                };
+            },
+            handleChangeFocus() {
+                this.isFocusedSearchBar = true;
+            },
+            handleBlur() {
+                this.isFocusedSearchBar = false;
+            },
             handleRequestSearch: _.debounce(function () {
                 this.loadingSearchResult = true;
-                setTimeout(() => this.loadingSearchResult = false, 2000);
+                this.getPostWithFilters()
+
+                setTimeout(() => {
+                    this.loadingSearchResult = false;
+                }, 2000);
             }, 500),
             handleChangeSearch(e) {
-                this.searchValue = e.target.value;
+                this.filters.search = e.target.value;
                 this.handleRequestSearch(e.target.value);
             },
-            async getPosts() {
+            async getPosts(queryParams) {
                 try {
                     this.loadingPosts = true;
-                    const { data } = await useRequest('/posts');
+                    const { data } = await useRequest(`/posts${queryParams ? `${queryParams}` : ''}`);
                     this.posts = data;
                     this.loadingPosts = false;
                     this.errorMessage = null;
@@ -165,7 +233,7 @@
                     this.loadingPosts = false;
                     this.errorMessage = err.message || JSON.stringify(err);
                 }
-            }
+            },
         }
     }
 </script>

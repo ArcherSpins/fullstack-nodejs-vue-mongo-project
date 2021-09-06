@@ -5,7 +5,7 @@ const auth = require('../middleware/auth_middleware')
 const { getUser } = require('../helpers/getUser')
 const router = Router()
 
-router.post('/create', auth, async (req, res) => {
+router.post('/create', async (req, res) => {
     try {
         const { title, content, typeUser, typePost, userId } = req.body
 
@@ -20,7 +20,36 @@ router.post('/create', auth, async (req, res) => {
     }
 })
 
-router.get('/', auth, async (req, res) => {
+router.put('/update', async (req, res) => {
+    try {
+        const { title, content, typeUser, typePost, postId, likes, comment } = req.body
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: 'Not found post!' })
+        }
+
+        await Post.findOneAndUpdate({ _id: postId }, {
+            title: title || post.title,
+            content: content || post.content,
+            typeUser: typeUser || post.typeUser,
+            typePost: typePost || post.typePost,
+            likes: likes || post.likes,
+            typePost: typePost || post.typePost,
+        }, {useFindAndModify: false});
+
+        const updatedPost = await Post.findById(postId);
+
+        res.status(200).json(updatedPost)
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' })
+    }
+})
+
+router.get('/', async (req, res) => {
     try {
         const { typeUser, typePost, userId, search, startDate, endDate } = req.query;
 
@@ -31,7 +60,7 @@ router.get('/', auth, async (req, res) => {
         }
 
         if (typePost) {
-            filter.typePost = typePost;
+            filter.typePost = typePost.split(',');
         }
 
         if (userId) {
@@ -39,7 +68,7 @@ router.get('/', auth, async (req, res) => {
         }
 
         if (search) {
-            filter.$text = { $search: search };
+            filter.$text = { $search: search.split(' ').map(w => `"${w}"`).join(' ') };
         }
 
         if (startDate) {
@@ -59,7 +88,7 @@ router.get('/', auth, async (req, res) => {
         }
 
         // Post.geoSearch
-
+        console.log(filter)
         const posts = await Post.find(filter) // ???
         const users = await User.find({})
 
@@ -76,9 +105,18 @@ router.get('/', auth, async (req, res) => {
     }
 })
 
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const posts = await Post.findById(req.params.id) // ???
+        res.json(posts);
+    } catch (err) {
+        res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' })
+    }
+})
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const posts = await Post.findByIdAndDelete(req.params.id) // ???
         res.json(posts);
     } catch (err) {
         res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' })
