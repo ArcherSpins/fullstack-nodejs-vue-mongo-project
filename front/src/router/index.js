@@ -3,6 +3,7 @@ import Auth from '../pages/autorization.vue';
 import Main from '../pages/main.vue';
 import Profile from '../pages/profile.vue';
 import Posts from '../pages/posts.vue';
+import CreatePost from '../pages/createPost.vue';
 
 // const checkUser = () => {
 //   const user = localStorage.getItem('user');
@@ -29,6 +30,11 @@ const routes = [
     path: '/posts',
     name: 'Posts',
     component: Posts
+  },
+  {
+    path: '/posts/create',
+    name: 'CreatePost',
+    component: CreatePost
   }
 ]
 

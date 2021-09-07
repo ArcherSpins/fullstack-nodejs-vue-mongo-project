@@ -19,6 +19,7 @@
     "vue": "^3.0.0",
     "vue-router": "^4.0.11",
     "vue3-datepicker": "^0.2.5",
+    "vuedraggable": "^4.1.0",
     "vuejs-datepicker": "^1.6.2",
     "vuetify": "^2.5.8",
     "vuex": "^4.0.2"

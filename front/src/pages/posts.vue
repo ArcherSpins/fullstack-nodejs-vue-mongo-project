@@ -56,7 +56,10 @@
             </div>
         </div>
         <div class="card posts-right--column">
-            <button class="btn btn-primary btn-sm" type="button">Create post</button>
+            <router-link class="w-100" to="/posts/create">
+                <button class="btn btn-primary btn-sm w-100" type="button">Create post</button>
+            </router-link>
+            
             <div class="mt-3">
                 <span class="badge bg-primary mx-1">All: 30</span>
                 <span class="badge bg-success mx-1">My: 14</span>
