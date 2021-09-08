@@ -48,7 +48,7 @@
             </div>
             <div v-if="!loadingPosts && posts.length" class="posts-list">
                 <div v-for="item in posts" :key="item.id" class="mb-3">
-                    <post-card :user="item.user" :post="item.post" />
+                    <post-card :onUpdatePost="handleUpdatePost" :getPosts="getPostWithFilters" :user="item.user" :post="item.post" />
                 </div>
                 <div v-if="errorMessage" class="text-danger">
                     {{ errorMessage }}
@@ -170,6 +170,16 @@
             }
         },
         methods: {
+            handleUpdatePost(idPost, currentPost) {
+                this.posts = this.posts.map(({ post, user }) => {
+                    if (idPost !== post._id) {
+                        return { post, user };
+                    }
+                    return {
+                        user, post: currentPost
+                    };
+                });
+            },
             getPostWithFilters() {
                 const { typePost, search } = this.filters;
                 let queryParams = '?'

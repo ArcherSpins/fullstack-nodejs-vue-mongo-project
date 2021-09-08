@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faUserSecret, faCamera, faPencilAlt, faTimes, faSave, faSearch, faEllipsisH } from '@fortawesome/free-solid-svg-icons'
+import { faUserSecret, faCamera, faPencilAlt, faTimes, faSave, faSearch, faEllipsisH, faHeart, faComment } from '@fortawesome/free-solid-svg-icons'
 import App from './App.vue'
 import router from './router'
 import { store } from './store';
@@ -13,6 +13,8 @@ library.add(faTimes)
 library.add(faSave)
 library.add(faSearch)
 library.add(faEllipsisH)
+library.add(faHeart)
+library.add(faComment)
 
 createApp(App)
     .use(store)

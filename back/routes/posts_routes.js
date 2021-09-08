@@ -22,7 +22,11 @@ router.post('/create', async (req, res) => {
 
 router.put('/update', async (req, res) => {
     try {
-        const { title, content, typeUser, typePost, postId, likes, comment } = req.body
+        const { title, content, typeUser, typePost, postId, userId, deleteLike } = req.body
+
+        if (!postId) {
+            return res.status(400).message({ message: 'Field "postId" is required!' })
+        }
 
         const post = await Post.findById(postId);
 
@@ -30,12 +34,16 @@ router.put('/update', async (req, res) => {
             return res.status(404).json({ message: 'Not found post!' })
         }
 
+        if (post.likes.find(item => item === userId) && !deleteLike) {
+            return res.status(400).json({ message: 'Such a user has already put a like!' })
+        }
+        
         await Post.findOneAndUpdate({ _id: postId }, {
             title: title || post.title,
             content: content || post.content,
             typeUser: typeUser || post.typeUser,
             typePost: typePost || post.typePost,
-            likes: likes || post.likes,
+            likes: Boolean(deleteLike) && deleteLike === 'true' ? post.likes.filter(like => like !== userId) : [...post.likes, userId],
             typePost: typePost || post.typePost,
         }, {useFindAndModify: false});
 
@@ -88,7 +96,6 @@ router.get('/', async (req, res) => {
         }
 
         // Post.geoSearch
-        console.log(filter)
         const posts = await Post.find(filter) // ???
         const users = await User.find({})
 
