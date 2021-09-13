@@ -57,13 +57,13 @@ router.put('/update', async (req, res) => {
     }
 })
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const { typeUser, typePost, userId, search, startDate, endDate } = req.query;
 
         const filter = {}
 
-        if (typeUser) {
+        if (typeUser && typeUser !== 'self') {
             filter.typeUser = typeUser;
         }
 
@@ -71,8 +71,8 @@ router.get('/', async (req, res) => {
             filter.typePost = typePost.split(',');
         }
 
-        if (userId) {
-            filter.owner = userId;
+        if (userId || typeUser) {
+            filter.userId = userId || req.user?.userId;
         }
 
         if (search) {
@@ -94,7 +94,6 @@ router.get('/', async (req, res) => {
                 }
             }
         }
-
         // Post.geoSearch
         const posts = await Post.find(filter) // ???
         const users = await User.find({})

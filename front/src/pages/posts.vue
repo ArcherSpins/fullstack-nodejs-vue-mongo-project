@@ -61,30 +61,30 @@
             </router-link>
             
             <div class="mt-3">
-                <span class="badge bg-primary mx-1">All: 30</span>
-                <span class="badge bg-success mx-1">My: 14</span>
-                <span class="badge bg-dark mx-1">Admin: 2</span>
-                <span class="badge bg-warning text-dark mx-1">Important: 8</span>
-                <span class="badge bg-info mx-1">Active: 5</span>
-                <span class="badge bg-danger mx-1">Canceled: 3</span>
+                <span class="badge bg-primary mx-1">All: {{ this.allPosts.length }}</span>
+                <span class="badge bg-success mx-1">My: {{ this.selfPostsCount }}</span>
+                <span class="badge bg-dark mx-1">Admin: {{ this.adminPostsCount }}</span>
+                <span class="badge bg-warning text-dark mx-1">Important: {{ this.getPostsFromPostType('important') }}</span>
+                <span class="badge bg-info mx-1">Active: {{ this.getPostsFromPostType('active') }}</span>
+                <span class="badge bg-danger mx-1">Canceled: {{ this.getPostsFromPostType('canceled') }}</span>
             </div>
             <b class="mt-4 mb-1 text-success">Filters: </b>
             <div class="d-flex justify-content-center">
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_all" checked>
+                    <input class="form-check-input" :checked="filters.typeUser === 'post_by_type_all' || filters.typeUser === null" @change="handleChageUserType" type="radio" name="post_by_type" id="post_by_type_all">
                     <label class="form-check-label" for="post_by_type_all">
                         All posts
                     </label>
                 </div>
                 <div class="form-check ml-2">
-                    <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_self">
+                    <input class="form-check-input" :checked="filters.typeUser === 'post_by_type_self'" @change="handleChageUserType" type="radio" name="post_by_type" id="post_by_type_self">
                     <label class="form-check-label" for="post_by_type_self">
                         My posts
                     </label>
                 </div>
                 <div class="form-check ml-2">
-                    <input class="form-check-input" type="radio" name="post_by_type" id="post_by_type_any">
-                    <label class="form-check-label" for="post_by_type_any">
+                    <input class="form-check-input" :checked="filters.typeUser === 'post_by_type_admin'" @change="handleChageUserType" type="radio" name="post_by_type" id="post_by_type_admin">
+                    <label class="form-check-label" for="post_by_type_admin">
                         Admin posts
                     </label>
                 </div>
@@ -124,18 +124,25 @@
 
 <script>
     import Datepicker from 'vue3-datepicker';
+    import { useStore } from 'vuex'
     import _ from 'lodash';
     import PostCard from '../components/Post/Post';
     import { useRequest } from '../api/useRequest.js';
     import './style.sass';
 
     export default {
+        setup() {
+            const store = useStore();
+
+            return { store }
+        },
         data() {
             return {
                 loadingSearchResult: false,
-                startDate: new Date(),
-                endDate: new Date(),
+                startDate: null,
+                endDate: null,
                 posts: [],
+                allPosts: [],
                 loadingPosts: false,
                 isFocusedSearchBar: false,
                 errorMessage: null,
@@ -153,23 +160,49 @@
         computed: {
             checkShowSearchMenu() {
                 return false;
+            },
+            selfPostsCount() {
+                return this.allPosts.filter(({ post }) => post.userId === this.store.state.user?.id).length;
+            },
+            adminPostsCount() {
+                return this.allPosts.filter(({ post }) => post.typeUser === 'admin').length;
             }
         },
         watch: {
             filters() {
                 this.getPostWithFilters()
+            },
+            startDate() {
+                this.getPostWithFilters()
+            },
+            endDate() {
+                this.getPostWithFilters()
             }
         },
-        mounted() {
+        async mounted() {
             const filters = localStorage.getItem('filters')
 
+            await this.getAllPosts();
+
             if (filters) {
-                this.filters = JSON.parse(filters)
+                const filtersObj = JSON.parse(filters);
+                this.filters = filtersObj
+                this.startDate = filtersObj.startDate ? new Date(filtersObj.startDate) : null
+                this.endDate = filtersObj.endDate ? new Date(filtersObj.endDate) : null
             } else {
                 this.getPosts()
             }
         },
         methods: {
+            getPostsFromPostType(typePost) {
+                return this.allPosts.filter(({ post }) => post.typePost === typePost).length;
+            },
+            handleChageUserType(e) {
+                this.filters = {
+                    ...this.filters,
+                    typeUser: e.target.id
+                }
+            },
             handleUpdatePost(idPost, currentPost) {
                 this.posts = this.posts.map(({ post, user }) => {
                     if (idPost !== post._id) {
@@ -181,18 +214,29 @@
                 });
             },
             getPostWithFilters() {
-                const { typePost, search } = this.filters;
+                const { startDate, endDate } = this;
+                const { typePost, search, typeUser } = this.filters;
                 let queryParams = '?'
                 let hasQuery = false;
 
-                localStorage.setItem('filters', JSON.stringify(this.filters))
+                localStorage.setItem('filters', JSON.stringify({ ...this.filters, startDate, endDate }))
 
-                const typePosts = Object.values(typePost).filter(Boolean);
+                const typePosts = Object.entries(typePost).filter(([, value]) => value);
 
                 if (typePosts.length) {
                     hasQuery = true;
                     queryParams += `typePost=`
-                    Object.keys(typePost).forEach((typePost, idx) => queryParams += ((idx > 0 ? ',' : '') + typePost));
+                    typePosts.forEach(([typePost], idx) => queryParams += ((idx > 0 ? ',' : '') + typePost));
+                }
+
+                if (typeUser && typeUser !== 'post_by_type_all') {
+                    if (hasQuery) {
+                        queryParams += '&';
+                    }
+
+                    queryParams += `typeUser=${typeUser.replace('post_by_type_', '')}`;
+
+                    hasQuery = true;
                 }
 
                 if (search) {
@@ -202,6 +246,22 @@
                         hasQuery = true;
                         queryParams += `search=${search}`
                     }
+                }
+
+                if (startDate) {
+                    if (hasQuery) {
+                        queryParams += '&';
+                    }
+
+                    queryParams += `startDate=${startDate}`
+                }
+
+                if (endDate) {
+                    if (hasQuery) {
+                        queryParams += '&';
+                    }
+
+                    queryParams += `endDate=${endDate}`
                 }
 
                 if (hasQuery) {
@@ -234,6 +294,16 @@
             handleChangeSearch(e) {
                 this.filters.search = e.target.value;
                 this.handleRequestSearch(e.target.value);
+            },
+            async getAllPosts() {
+                try {
+                    this.loadingPosts = true;
+                    const { data } = await useRequest('/posts');
+                    this.allPosts = data;
+                    this.errorMessage = null;
+                } catch (err) {
+                    this.errorMessage = err.message || JSON.stringify(err);
+                }
             },
             async getPosts(queryParams) {
                 try {

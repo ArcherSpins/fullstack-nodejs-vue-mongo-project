@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="mt-4">
-            <b class="mb-2 text-secondary">{{ $props.post?.title }}</b>
+            <b class="mb-2 text-secondary">{{ $props.post?.title }}</b> typePost: {{ $props.post?.typePost }}
             <img v-if="$props.post?.image" :src="$props.post?.image" />
             <p>{{ $props.post?.content }}</p>
         </div>

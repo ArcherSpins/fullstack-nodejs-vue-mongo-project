@@ -39,9 +39,7 @@
     },
     computed: {
       checkAuth() {
-        const userJson = localStorage.getItem('user');
-
-        return Boolean(this.store.state.user || userJson)
+        return Boolean(this.store.state.user)
       }
     },
     methods: {
